@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Navigate } from 'react-router-dom';
 import Card from '../../components/ui/Card';
 import { generateAITrack } from '../../services/api';
-import { GeneratedTrack } from '../../types';
+import { GeneratedTrack, Role } from '../../types';
+import { AuthContext } from '../../context/AuthContext';
 
 const AIStudioPage: React.FC = () => {
+    const { user } = useContext(AuthContext);
     const [genre, setGenre] = useState('Chillwave');
     const [mood, setMood] = useState('Nostalgic');
     const [duration, setDuration] = useState(60);
     const [isLoading, setIsLoading] = useState(false);
     const [generatedTrack, setGeneratedTrack] = useState<GeneratedTrack | null>(null);
+
+    if (user && ![Role.ADMIN, Role.MUSIC_CREATOR].includes(user.role)) {
+        return <Navigate to="/home" replace />;
+    }
 
     const handleGenerate = async () => {
         setIsLoading(true);

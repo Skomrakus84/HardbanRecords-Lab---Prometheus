@@ -4,7 +4,17 @@ import { GoogleGenAI, Type } from "@google/genai";
 import {
     MusicRelease, Artist, AnalyticsData, Book, Author, SmartLink, GeneratedTrack, PressRelease,
     Contact, Campaign, CalendarEvent, MediaMention, Content, Product, Order, SocialPlatform,
-    Contract, PlaylistPlacement, PublishingStore, Role, ActivityStatus
+    Contract, PlaylistPlacement, PublishingStore, Role, ActivityStatus, Transaction, TransactionStatus, 
+    TransactionType, WalletData, AudienceData, AudienceSegment, Goal, GoalStatus,
+    CollaborationProject, CollaborationProjectStatus, CreativeFeedback, CatalogueAsset, AuditOpportunity,
+    SalesForecast,
+    CampaignStrategy,
+    MarketTrend,
+    CreativeOpportunity,
+    FanInteraction,
+    CommunityAnalytics,
+    BrandKeyword,
+    BrandReport
 } from '../types';
 
 // --- GEMINI API SETUP ---
@@ -63,6 +73,142 @@ let products: Product[] = [
 
 let orders: Order[] = [
     { id: 'ord-1', customerName: 'Jane Smith', date: '2024-05-21', total: 25.00, status: 'Delivered', items: [{ productId: 'prod-1', quantity: 1 }] },
+];
+
+const transactions: Transaction[] = [
+    { id: 'txn-1', date: '2024-06-20', description: "Royalty from 'Cosmic Dream' on Spotify", type: TransactionType.ROYALTY, status: TransactionStatus.CLEARED, amount: 150.25 },
+    { id: 'txn-2', date: '2024-06-19', description: "Sale of 'Cosmic Dream T-Shirt'", type: TransactionType.SALE, status: TransactionStatus.CLEARED, amount: 18.50 },
+    { id: 'txn-3', date: '2024-06-18', description: "Sale of 'The Silent Forest' on Amazon", type: TransactionType.SALE, status: TransactionStatus.CLEARED, amount: 4.99 },
+    { id: 'txn-4', date: '2024-06-15', description: "Payout to Bank Account", type: TransactionType.PAYOUT, status: TransactionStatus.PAID_OUT, amount: -5200.00 },
+    { id: 'txn-5', date: '2024-06-12', description: "Royalty from 'Midnight City' on Apple Music", type: TransactionType.ROYALTY, status: TransactionStatus.PENDING, amount: 85.60 },
+    { id: 'txn-6', date: '2024-06-10', description: "Royalty from 'Synthwave Memories' on YouTube", type: TransactionType.ROYALTY, status: TransactionStatus.CLEARED, amount: 45.10 },
+];
+
+const audienceData: AudienceData = {
+    totalAudience: 785430,
+    audienceGrowth: [
+        { month: 'Jan', newFollowers: 1200 },
+        { month: 'Feb', newFollowers: 1500 },
+        { month: 'Mar', newFollowers: 1300 },
+        { month: 'Apr', newFollowers: 1800 },
+        { month: 'May', newFollowers: 2500 },
+        { month: 'Jun', newFollowers: 3200 },
+    ],
+    engagementRate: 4.7,
+    topEngagement: [
+        { id: 'eng-1', contentTitle: 'Cosmic Dream', contentType: 'Release', metric: 'Streams', value: 1250000 },
+        { id: 'eng-2', contentTitle: 'The Silent Forest', contentType: 'Book', metric: 'Sales', value: 15200 },
+        { id: 'eng-3', contentTitle: 'Cosmic Dream T-Shirt', contentType: 'Product', metric: 'Sales', value: 150 },
+        { id: 'eng-4', contentTitle: 'New single announcement!', contentType: 'Post', metric: 'Likes', value: 12000 },
+    ],
+    geoDistribution: [ { id: 'USA', value: 500000 }, { id: 'GBR', value: 150000 }, { id: 'CAN', value: 120000 }, { id: 'AUS', value: 100000 }, { id: 'DEU', value: 80000 } ],
+    fanDemographics: {
+        age: [ { name: '18-24', value: 45 }, { name: '25-34', value: 35 }, { name: '35-44', value: 15 }, { name: '45+', value: 5 } ],
+        gender: [ { name: 'Female', value: 55 }, { name: 'Male', value: 42 }, { name: 'Non-binary', value: 3 } ]
+    }
+};
+
+let goals: Goal[] = [
+    { 
+        id: 'goal-1', 
+        title: "Increase 'Cosmic Dream' streams", 
+        description: "Boost the streams for the latest single to drive discovery and revenue.",
+        status: GoalStatus.ON_TRACK, 
+        dueDate: '2024-08-31', 
+        progress: 25, 
+        targetMetric: "5,000,000 streams",
+        currentValue: "1,250,000",
+        suggestedTasks: [
+            { id: 't-1-1', description: 'Create a Smart Link for the single', isCompleted: true, link: '/marketing/smart-links' },
+            { id: 't-1-2', description: 'Run a social media ad campaign', isCompleted: false, link: '/marketing/campaigns' },
+            { id: 't-1-3', description: 'Pitch to 10 independent playlist curators', isCompleted: false, link: '/marketing/contacts' },
+        ]
+    },
+    { 
+        id: 'goal-2', 
+        title: "Launch 'Cosmic Dream' Merchandise", 
+        description: "Capitalize on the single's momentum by releasing a new line of merchandise.",
+        status: GoalStatus.NOT_STARTED, 
+        dueDate: '2024-09-15', 
+        progress: 0, 
+        targetMetric: "$1,000 in sales",
+        currentValue: "$0",
+        suggestedTasks: [
+            { id: 't-2-1', description: 'Design a T-shirt in the Creative Studio', isCompleted: false, link: '/marketing/creative-studio' },
+            { id: 't-2-2', description: 'Add the new T-shirt to the store', isCompleted: false, link: '/ecommerce/products' },
+            { id: 't-2-3', description: 'Announce the merch drop on social media', isCompleted: false, link: '/marketing/social-media' },
+        ]
+    }
+];
+
+let collaborationProjects: CollaborationProject[] = [
+    {
+        id: 'collab-1',
+        title: 'Seeking Vocalist for Chillwave Track',
+        description: 'I have a fully produced instrumental track in the style of Tycho and Com Truise. Looking for a talented vocalist with a dreamy, ethereal voice to write and record vocals.',
+        creatorId: 'creator-001',
+        creatorName: 'Casey Creator',
+        status: CollaborationProjectStatus.OPEN,
+        rolesNeeded: ['Vocalist', 'Lyricist'],
+        revenueSplits: [
+            { role: 'Producer', share: 50, userId: 'creator-001' },
+            { role: 'Vocalist', share: 25 },
+            { role: 'Lyricist', share: 25 },
+        ]
+    },
+    {
+        id: 'collab-2',
+        title: 'Illustrator for Sci-Fi Book Cover',
+        description: 'My new novel, "Echoes of Tomorrow", is complete. I need a talented illustrator to create a compelling, professional cover in a retro-futuristic style.',
+        creatorId: 'author-001',
+        creatorName: 'Pat Publisher',
+        status: CollaborationProjectStatus.OPEN,
+        rolesNeeded: ['Illustrator'],
+        revenueSplits: [
+            { role: 'Author', share: 95, userId: 'author-001' },
+            { role: 'Illustrator', share: 5 },
+        ]
+    },
+     {
+        id: 'collab-3',
+        title: 'Remix Opportunity: "Cosmic Dream"',
+        description: 'Calling all producers! I\'m looking for creative remixes of my latest single, "Cosmic Dream". Open to all genres, from house to drum and bass. Stems are available upon request.',
+        creatorId: 'creator-001',
+        creatorName: 'Casey Creator',
+        status: CollaborationProjectStatus.IN_PROGRESS,
+        rolesNeeded: ['Remixer', 'Producer'],
+        revenueSplits: [
+            { role: 'Original Artist', share: 60, userId: 'creator-001' },
+            { role: 'Remixer', share: 40 },
+        ]
+    }
+];
+
+let creativeFeedbackHistory: CreativeFeedback[] = [
+    {
+        id: 'cf-1',
+        ideaSnippet: "A new song called 'Starlight Echoes' about finding a lost connection through time.",
+        commercialPotential: 88,
+        keyEmotions: [
+            { emotion: 'Nostalgia', score: 92 },
+            { emotion: 'Melancholy', score: 75 },
+            { emotion: 'Joy', score: 60 },
+        ],
+        creativeSuggestions: [
+            "Lean into the nostalgic theme with vintage synth sounds, as this resonates strongly with your 'Loyal Collector' segment.",
+            "Consider a contrasting bridge section that shifts from melancholy to a more hopeful tone to maximize emotional impact.",
+            "The title 'Starlight Echoes' is strong; use it in visual marketing with cosmic imagery."
+        ],
+        analysisDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    }
+];
+
+const fanInteractions: FanInteraction[] = [
+    { id: 'fi-1', fanId: 'fan-1', fanName: 'SynthwaveLover88', fanAvatar: 'https://i.pravatar.cc/150?u=fan1', type: 'Comment', content: "Cosmic Dream is an absolute masterpiece! The synth solo gives me chills every time. Can't wait for the vinyl release!", date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'fi-2', fanId: 'fan-2', fanName: 'BookwormJane', fanAvatar: 'https://i.pravatar.cc/150?u=fan2', type: 'Comment', content: "Just finished The Silent Forest and I'm speechless. The world-building is incredible. Is there going to be a sequel??", date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'fi-3', fanId: 'fan-1', fanName: 'SynthwaveLover88', fanAvatar: 'https://i.pravatar.cc/150?u=fan1', type: 'Purchase', content: "Purchased 'Cosmic Dream T-Shirt'", date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'fi-4', fanId: 'fan-3', fanName: 'MusicFan23', fanAvatar: 'https://i.pravatar.cc/150?u=fan3', type: 'Comment', content: "This is a good song but the mix feels a little muddy in the low end.", date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 'fi-5', fanId: 'fan-4', fanName: 'Alex R.', fanAvatar: 'https://i.pravatar.cc/150?u=fan4', type: 'Comment', content: "When are you touring next? Would love to see you live!", date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
 ];
 
 
@@ -154,6 +300,7 @@ export const getAnalyticsData = (userId?: string): AnalyticsData => ({
         gender: [ { name: 'Female', value: 55 }, { name: 'Male', value: 42 }, { name: 'Non-binary', value: 3 } ]
     }
 });
+export const getAudienceData = (): AudienceData => audienceData;
 export const getBookSalesData = () => [ { month: 'Jan', amazon: 4000, apple: 2400, kobo: 1200 }, { month: 'Feb', amazon: 3000, apple: 1398, kobo: 1000 }, { month: 'Mar', amazon: 2000, apple: 9800, kobo: 1500 }, { month: 'Apr', amazon: 2780, apple: 3908, kobo: 1800 }, { month: 'May', amazon: 1890, apple: 4800, kobo: 2000 }, { month: 'Jun', amazon: 2390, apple: 3800, kobo: 2200 } ];
 export const getPublishingStores = (): PublishingStore[] => [ { name: 'Amazon KDP', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Amazon-KDP-Logo.svg/2560px-Amazon-KDP-Logo.svg.png', status: 'Live' }, { name: 'Apple Books', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/1024px-Apple_Music_icon.svg.png', status: 'Live' }, ];
 export const getSmartLinks = () => smartLinks;
@@ -196,6 +343,67 @@ export const getPlaylistPlacements = (): PlaylistPlacement[] => [
     { id: 'pl-1', playlistName: 'Chillwave Vibes', platform: 'Spotify', followers: 125000, releaseTitle: 'Cosmic Dream' },
     { id: 'pl-2', playlistName: 'Synthwave Hits', platform: 'Apple Music', followers: 250000, releaseTitle: 'Synthwave Memories' },
 ];
+
+// FINANCES
+export const getWalletData = (): WalletData => ({
+    currentBalance: 5850.75,
+    lifetimeEarnings: 125680.00,
+    nextPayoutAmount: 5850.75,
+    nextPayoutDate: 'July 15, 2024',
+    earningsBreakdown: [
+        { name: 'Music Royalties', value: 75000 },
+        { name: 'Book Sales', value: 45000 },
+        { name: 'Merchandise', value: 5680 },
+    ]
+});
+export const getTransactions = (): Transaction[] => transactions;
+
+// STRATEGY
+export const getGoals = (): Goal[] => goals;
+export const addGoal = (goalData: Partial<Goal>): Goal => {
+    const newGoal: Goal = {
+        id: `goal-${Date.now()}`,
+        title: 'New Goal',
+        description: '',
+        status: GoalStatus.NOT_STARTED,
+        dueDate: '',
+        progress: 0,
+        targetMetric: '',
+        currentValue: '',
+        suggestedTasks: [],
+        ...goalData
+    };
+    goals.unshift(newGoal);
+    return newGoal;
+};
+
+// COLLABORATION
+export const getCollaborationProjects = (): CollaborationProject[] => collaborationProjects;
+// FIX: Update function signature to correctly reflect that creator info is passed separately, resolving a type error in ProjectFinderPage.tsx.
+export const addCollaborationProject = (projectData: Omit<CollaborationProject, 'id' | 'status' | 'creatorId' | 'creatorName'>, creator: {id: string, name: string}): CollaborationProject => {
+    const newProject: CollaborationProject = {
+        ...projectData,
+        id: `collab-${Date.now()}`,
+        status: CollaborationProjectStatus.OPEN,
+        creatorId: creator.id,
+        creatorName: creator.name,
+    };
+    collaborationProjects.unshift(newProject);
+    return newProject;
+};
+
+// CREATIVE
+export const getCreativeFeedbackHistory = (): CreativeFeedback[] => creativeFeedbackHistory;
+export const addCreativeFeedback = (feedback: Omit<CreativeFeedback, 'id' | 'analysisDate'>): CreativeFeedback => {
+    const newFeedback: CreativeFeedback = {
+        ...feedback,
+        id: `cf-${Date.now()}`,
+        analysisDate: new Date().toISOString(),
+    };
+    creativeFeedbackHistory.unshift(newFeedback);
+    return newFeedback;
+};
+
 
 // --- GEMINI API FUNCTIONS ---
 
@@ -251,6 +459,139 @@ export const getAIInsight = async (contextData: string): Promise<string> => {
     }
 };
 
+export const generateAudienceSegments = async (data: AudienceData): Promise<AudienceSegment[]> => {
+    try {
+        const prompt = `Based on the following JSON data about a creator's audience, generate 3 distinct audience segments or personas. For each segment, provide a creative name, a brief description, its size as a percentage of the total audience, 2-3 key characteristics, and a short, actionable marketing insight. Audience data: ${JSON.stringify(data)}`;
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            name: { type: Type.STRING },
+                            description: { type: Type.STRING },
+                            sizePercentage: { type: Type.NUMBER },
+                            keyCharacteristics: {
+                                type: Type.ARRAY,
+                                items: { type: Type.STRING }
+                            },
+                            marketingInsight: { type: Type.STRING }
+                        }
+                    }
+                }
+            }
+        });
+
+        const jsonStr = response.text.trim();
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error generating audience segments:", error);
+        // Return mock data on failure
+        return [
+            { name: 'The Trendsetter', description: 'Early adopters who are highly engaged on social media.', sizePercentage: 25, keyCharacteristics: ['Ages 18-24', 'High social media usage', 'Prefers digital music'], marketingInsight: 'Engage them with TikTok challenges and behind-the-scenes content.' },
+            { name: 'The Loyal Collector', description: 'Dedicated fans who purchase physical media and merchandise.', sizePercentage: 15, keyCharacteristics: ['Ages 25-44', 'Buys merchandise', 'Attends live events'], marketingInsight: 'Offer exclusive limited-edition vinyl or signed book copies.' },
+            { name: 'The Casual Browser', description: 'Discovered the creator through playlists or recommendations.', sizePercentage: 60, keyCharacteristics: ['Wide age range', 'Passive listener/reader', 'Low merchandise purchase rate'], marketingInsight: 'Convert them to followers with targeted ads and email newsletters offering exclusive content.' },
+        ];
+    }
+};
+
+export const generateGoalSuggestions = async (userRole: Role, userData: any): Promise<Partial<Goal>[]> => {
+    try {
+        const prompt = `You are a strategic advisor for a ${userRole === Role.MUSIC_CREATOR ? 'music creator' : 'book author'}. Based on their current data, suggest 3 actionable and specific goals. For each goal, provide a title, a short description, a targetMetric (e.g., "100,000 streams"), and a due date within the next 3 months. User Data: ${JSON.stringify(userData)}`;
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            title: { type: Type.STRING },
+                            description: { type: Type.STRING },
+                            targetMetric: { type: Type.STRING },
+                            dueDate: { type: Type.STRING, description: "Date in YYYY-MM-DD format" }
+                        },
+                        required: ["title", "description", "targetMetric", "dueDate"]
+                    }
+                }
+            }
+        });
+        const jsonStr = response.text.trim();
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error generating goal suggestions:", error);
+        // Return mock data on failure
+        return [
+            { title: "Engage Your Top Audience Segment", description: "Create a targeted campaign for 'The Trendsetter' segment to boost engagement.", targetMetric: "10% engagement increase", dueDate: new Date(Date.now() + 60*24*60*60*1000).toISOString().split('T')[0] },
+            { title: "Boost 'Midnight City' Streams", description: "Run a campaign to get the 'Midnight City' single to 1 million total streams.", targetMetric: "1,000,000 streams", dueDate: new Date(Date.now() + 90*24*60*60*1000).toISOString().split('T')[0] },
+            { title: "Plan Next Release", description: "Finalize and schedule your next release, 'Ocean Tides', to maintain momentum.", targetMetric: "Release scheduled", dueDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0] },
+        ];
+    }
+}
+
+export const analyzeCreativeIdea = async (idea: string, audienceData: AudienceData): Promise<Omit<CreativeFeedback, 'id' | 'analysisDate'>> => {
+    try {
+        const prompt = `You are an expert A&R and literary agent. Analyze this creative idea: "${idea}". 
+        Base your analysis on this audience data: ${JSON.stringify(audienceData.fanDemographics)}.
+        Provide a commercial potential score (0-100).
+        Identify the top 3 key emotional triggers from this list: Nostalgia, Excitement, Melancholy, Tension, Joy. Provide a score for each (0-100).
+        Give 3 concrete, actionable creative suggestions for improvement.
+        Return the data as a JSON object.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        ideaSnippet: { type: Type.STRING },
+                        commercialPotential: { type: Type.NUMBER },
+                        keyEmotions: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    emotion: { type: Type.STRING },
+                                    score: { type: Type.NUMBER }
+                                }
+                            }
+                        },
+                        creativeSuggestions: {
+                            type: Type.ARRAY,
+                            items: { type: Type.STRING }
+                        }
+                    }
+                }
+            }
+        });
+
+        const jsonStr = response.text.trim();
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error analyzing creative idea:", error);
+        // Fallback mock data
+        return {
+            ideaSnippet: idea,
+            commercialPotential: 75,
+            keyEmotions: [{ emotion: 'Nostalgia', score: 85 }, { emotion: 'Joy', score: 65 }],
+            creativeSuggestions: ["This is mock data due to an API error.", "Consider simplifying the chorus.", "The visual concept is strong."]
+        };
+    }
+};
+
 export const getAIAssistantResponse = async (prompt: string): Promise<string> => {
     return generateTextContent(`You are an expert marketing assistant for music artists and authors. Respond to the following user query: "${prompt}"`);
 };
@@ -288,6 +629,458 @@ export const getMediaMentions = async (): Promise<MediaMention[] | { error: stri
         return { error: `An error occurred while searching for mentions: ${error.message}` };
     }
 };
+
+export const getCreatorCatalogue = (userId: string): CatalogueAsset[] => {
+    // In a real app, this would fetch based on userId
+    const musicAssets: CatalogueAsset[] = releases.map(r => ({
+        id: r.id,
+        type: 'Music',
+        title: r.title,
+        authorOrArtist: r.artist,
+        coverArt: r.coverArt,
+        releaseDate: '2023-10-26' // mock date
+    }));
+    const bookAssets: CatalogueAsset[] = books.map(b => ({
+        id: b.id,
+        type: 'Book',
+        title: b.title,
+        authorOrArtist: b.author,
+        coverArt: b.coverArt,
+        releaseDate: '2022-05-15' // mock date
+    }));
+    return [...musicAssets, ...bookAssets];
+};
+
+export const runCatalogueAudit = async (catalogue: CatalogueAsset[]): Promise<AuditOpportunity[]> => {
+    try {
+        const prompt = `You are an expert A&R and marketing strategist. Analyze this creator's back-catalogue and identify up to 3-4 assets with the highest untapped potential for re-monetization or promotion. For each identified asset, provide a "potentialScore" (0-100), a concise "insight" explaining why it has potential (e.g., genre is trending, seasonal relevance), and a list of 2-3 concrete "suggestedActions". Catalogue data: ${JSON.stringify(catalogue)}`;
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            assetId: { type: Type.STRING },
+                            assetTitle: { type: Type.STRING },
+                            assetType: { type: Type.STRING },
+                            potentialScore: { type: Type.NUMBER },
+                            insight: { type: Type.STRING },
+                            suggestedActions: {
+                                type: Type.ARRAY,
+                                items: { type: Type.STRING }
+                            }
+                        },
+                        required: ["assetId", "assetTitle", "assetType", "potentialScore", "insight", "suggestedActions"]
+                    }
+                }
+            }
+        });
+
+        const jsonStr = response.text.trim();
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error running catalogue audit:", error);
+        // Fallback mock data
+        return [
+            { assetId: 'rel-2', assetTitle: 'Midnight City', assetType: 'Music', potentialScore: 85, insight: "The Synthwave genre is experiencing a resurgence on TikTok. This track fits the trend perfectly.", suggestedActions: ["Create a TikTok campaign using this track.", "Pitch to 'Retro Revival' Spotify playlists.", "Run targeted ads to fans of The Midnight and Kavinsky."] },
+            { assetId: 'book-1', assetTitle: 'The Silent Forest', assetType: 'Book', potentialScore: 78, insight: "With the rise of #DarkAcademia and #CottageCore on social media, this book's theme is highly relevant again.", suggestedActions: ["Promote on Instagram and Pinterest with aesthetic visuals.", "Offer a limited-time discount for the e-book.", "Engage with BookTok influencers for reviews."] },
+        ];
+    }
+};
+
+export const runSalesForecast = async (asset: CatalogueAsset, period: number): Promise<SalesForecast> => {
+    try {
+        const unit = asset.type === 'Music' ? 'streams' : 'sales';
+        const prompt = `You are a data scientist specializing in media sales forecasting. Analyze this creative asset: ${JSON.stringify(asset)}. 
+        Generate a realistic sales/stream forecast for the next ${period} months. 
+        Provide a month-by-month breakdown with 'projected', 'optimistic', and 'pessimistic' scenarios for the units (${unit}).
+        Also provide a total projectedUnits and projectedRevenue for the period, a confidence level ('High', 'Medium', or 'Low'), and a short strategic 'insight'.
+        Assume a revenue of $0.0035 per stream for music, and $4.50 per sale for books.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        projectedUnits: { type: Type.NUMBER },
+                        projectedRevenue: { type: Type.NUMBER },
+                        confidence: { type: Type.STRING },
+                        insight: { type: Type.STRING },
+                        data: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    month: { type: Type.STRING },
+                                    projected: { type: Type.NUMBER },
+                                    optimistic: { type: Type.NUMBER },
+                                    pessimistic: { type: Type.NUMBER }
+                                }
+                            }
+                        }
+                    },
+                    required: ["projectedUnits", "projectedRevenue", "confidence", "insight", "data"]
+                }
+            }
+        });
+        
+        const jsonResult = JSON.parse(response.text.trim());
+        return {
+            ...jsonResult,
+            assetId: asset.id,
+            assetTitle: asset.title,
+            forecastPeriod: period,
+        };
+
+    } catch (error) {
+        console.error("Error running sales forecast:", error);
+        // Fallback mock data
+        const months = Array.from({ length: period }, (_, i) => new Date(Date.now() + i * 30 * 24 * 60 * 60 * 1000).toLocaleString('default', { month: 'short' }));
+        const mockData = months.map((m, i) => ({
+            month: m,
+            projected: 50000 + i * 10000,
+            optimistic: 60000 + i * 12000,
+            pessimistic: 40000 + i * 8000,
+        }));
+
+        return {
+            assetId: asset.id,
+            assetTitle: asset.title,
+            forecastPeriod: period,
+            projectedUnits: 390000,
+            projectedRevenue: 1365,
+            confidence: 'Medium',
+            insight: 'This is fallback mock data due to an API error. The forecast suggests steady growth based on historical trends.',
+            data: mockData
+        };
+    }
+};
+
+export const generateCampaignStrategy = async (asset: CatalogueAsset, platform: string): Promise<CampaignStrategy> => {
+    try {
+        const prompt = `You are an expert marketing strategist for independent creators. A ${asset.type === 'Music' ? 'musician' : 'author'} wants to launch a marketing campaign for their asset titled "${asset.title}" by ${asset.authorOrArtist}. The campaign will primarily target ${platform}. Create a comprehensive 4-week marketing strategy as a JSON object. The strategy should include a catchy campaign title, a description of the target audience, the key messaging, 3-4 content pillars, a 4-week timeline with specific activities for each week, and 2 sample posts for the target platform, including an image prompt for one of them.`;
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        campaignTitle: { type: Type.STRING },
+                        targetAudience: { type: Type.STRING },
+                        keyMessaging: { type: Type.STRING },
+                        contentPillars: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        timeline: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    week: { type: Type.STRING },
+                                    activities: { type: Type.ARRAY, items: { type: Type.STRING } }
+                                }
+                            }
+                        },
+                        postExamples: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    platform: { type: Type.STRING },
+                                    content: { type: Type.STRING },
+                                    imagePrompt: { type: Type.STRING }
+                                }
+                            }
+                        }
+                    },
+                    required: ["campaignTitle", "targetAudience", "keyMessaging", "contentPillars", "timeline", "postExamples"]
+                }
+            }
+        });
+
+        const jsonStr = response.text.trim();
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error generating campaign strategy:", error);
+        // Fallback mock data
+        return {
+            campaignTitle: `Mock Campaign for ${asset.title}`,
+            targetAudience: "This is mock data due to an API error. Target audience would be described here.",
+            keyMessaging: "Key messaging and campaign slogan.",
+            contentPillars: ["Behind the Scenes", "Creator's Story", "Interactive Content"],
+            timeline: [
+                { week: "Week 1: Teaser Phase", activities: ["Announce project", "Share snippets"] },
+                { week: "Week 2: Pre-Launch Hype", activities: ["Countdown posts", "Q&A session"] },
+                { week: "Week 3: Launch Week", activities: ["Launch post", "Go live on platform"] },
+                { week: "Week 4: Post-Launch Engagement", activities: ["Share fan reactions", "Post-launch analysis"] }
+            ],
+            postExamples: [
+                { platform: platform, content: "This is a mock post example.", imagePrompt: "A vibrant, abstract image related to the asset." },
+                { platform: platform, content: "Another mock post to showcase variety." }
+            ]
+        };
+    }
+};
+
+export const findMarketOpportunities = async (catalogue: CatalogueAsset[], role: Role): Promise<{ trends: MarketTrend[], opportunities: CreativeOpportunity[] }> => {
+    try {
+        const creatorType = role === Role.MUSIC_CREATOR ? 'music creator specializing in genres like synthwave and chillwave' : 'book author specializing in fantasy and sci-fi';
+        const prompt = `You are a market trend analyst for a ${creatorType}. Their current catalogue is: ${JSON.stringify(catalogue.map(c => c.title))}. 
+        Using Google Search, find 3 current (within the last 3-6 months), specific, and verifiable market trends for their niche on platforms like TikTok, YouTube, Instagram, or Goodreads. 
+        Then, generate 2 unique and actionable creative opportunities based on these trends and the creator's existing style shown in their catalogue. 
+        Each opportunity must directly relate to one of the trends you found. Provide a strong rationale for why the opportunity fits the trend and the creator's brand.
+        For music, an AI snippet could be a lyrical theme or a description of a musical motif. For books, it could be a character archetype or a plot hook.`;
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                tools: [{ googleSearch: {} }],
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        trends: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    id: { type: Type.STRING },
+                                    platform: { type: Type.STRING },
+                                    description: { type: Type.STRING }
+                                }
+                            }
+                        },
+                        opportunities: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    id: { type: Type.STRING },
+                                    title: { type: Type.STRING },
+                                    description: { type: Type.STRING },
+                                    relatedTrendId: { type: Type.STRING },
+                                    assetSuggestion: {
+                                        type: Type.OBJECT,
+                                        properties: {
+                                            type: { type: Type.STRING },
+                                            format: { type: Type.STRING }
+                                        }
+                                    },
+                                    aiSnippet: {
+                                        type: Type.OBJECT,
+                                        properties: {
+                                            type: { type: Type.STRING },
+                                            content: { type: Type.STRING }
+                                        }
+                                    },
+                                    rationale: { type: Type.STRING }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+        const jsonResponse = JSON.parse(response.text.trim());
+        
+        if (groundingChunks && groundingChunks.length > 0) {
+            jsonResponse.trends.forEach((trend: any, index: number) => {
+                const source = groundingChunks[index % groundingChunks.length]?.web;
+                if (source) {
+                    trend.source = { title: source.title || "Web Source", uri: source.uri };
+                }
+            });
+        }
+        
+        return jsonResponse;
+
+    } catch (error) {
+        console.error("Error finding market opportunities:", error);
+        // Fallback mock data
+        return {
+            trends: [
+                { id: 'trend-1', platform: 'TikTok', description: 'Retro-funk and synthwave sounds are trending in dance challenges.', source: { title: 'TikTok Trends Report', uri: '#' } },
+                { id: 'trend-2', platform: 'YouTube', description: 'Long-form "focus music" mixes (1hr+) are gaining millions of views, especially in the lofi and chillwave genres.', source: { title: 'YouTube Music Insights', uri: '#' } },
+            ],
+            opportunities: [
+                { id: 'opp-1', title: 'Create a "Neon Groove" TikTok Sound', description: 'Produce a high-energy, 15-second synthwave audio clip designed for viral dance challenges.', relatedTrendId: 'trend-1', assetSuggestion: { type: 'Short-form Content', format: '15-second TikTok Audio' }, aiSnippet: { type: 'Melody Description', content: 'A punchy bassline with a catchy, arpeggiated synth lead and a strong, simple drum beat.' }, rationale: 'This directly taps into the TikTok trend while fitting perfectly with your existing synthwave style, potentially driving traffic to your full tracks.' },
+                { id: 'opp-2', title: 'Launch "Cosmic Dreams: The Focus Session"', description: 'Compile your existing tracks like "Cosmic Dream" and "Midnight City" into a 1-hour seamless mix for YouTube.', relatedTrendId: 'trend-2', assetSuggestion: { type: 'New Release', format: '1-hour YouTube Mix' }, aiSnippet: { type: 'Lyrical Idea', content: 'Use titles like "Synthwave for Coding" or "Retro Focus Playlist" to capture search traffic.' }, rationale: 'This leverages your back-catalogue to engage the large "focus music" audience on YouTube, requiring minimal new production effort for potentially high-reward in terms of streams and discovery.' },
+            ]
+        };
+    }
+};
+
+export const getCommunityAnalytics = async (): Promise<CommunityAnalytics> => {
+     try {
+        const prompt = `You are an expert community manager for a creative artist. Analyze this raw data of recent fan interactions and generate a community analytics report. 
+        The report should contain:
+        1. A "communityPulseSummary": A short, 2-3 sentence summary of the overall community mood, key topics of discussion, and any recurring questions.
+        2. A list of 2 "topFans": Identify the most engaged and positive fans. For each, provide a reason for why they are a top fan and a suggested action for the creator to take to acknowledge them.
+        3. A list of 2 "engagementOpportunities": Find specific, interesting comments from fans that warrant a reply. For each, provide a suggested reply that is authentic, engaging, and personalized.
+
+        Fan Interaction Data: ${JSON.stringify(fanInteractions)}`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        communityPulseSummary: { type: Type.STRING },
+                        topFans: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    fanId: { type: Type.STRING },
+                                    fanName: { type: Type.STRING },
+                                    fanAvatar: { type: Type.STRING },
+                                    reason: { type: Type.STRING },
+                                    suggestedAction: { type: Type.STRING }
+                                }
+                            }
+                        },
+                        engagementOpportunities: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    interactionId: { type: Type.STRING },
+                                    fanName: { type: Type.STRING },
+                                    fanAvatar: { type: Type.STRING },
+                                    comment: { type: Type.STRING },
+                                    aiReplySuggestion: { type: Type.STRING }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const jsonStr = response.text.trim();
+        return JSON.parse(jsonStr);
+
+    } catch (error) {
+        console.error("Error generating community analytics:", error);
+        // Fallback mock data
+        return {
+            communityPulseSummary: "This is mock data due to an API error. Overall fan sentiment is positive, with lots of excitement around new releases. Fans are frequently asking about upcoming tours and merchandise.",
+            topFans: [
+                { fanId: 'fan-1', fanName: 'SynthwaveLover88', fanAvatar: 'https://i.pravatar.cc/150?u=fan1', reason: 'Consistently leaves positive comments and purchased merchandise.', suggestedAction: 'Send a direct message thanking them for their support and offer a small discount code for their next purchase.' },
+                { fanId: 'fan-2', fanName: 'BookwormJane', fanAvatar: 'https://i.pravatar.cc/150?u=fan2', reason: 'Passionate and insightful comments about book plots.', suggestedAction: 'Reply to their comment publicly, acknowledging their great question about a sequel.' },
+            ],
+            engagementOpportunities: [
+                { interactionId: 'fi-2', fanName: 'BookwormJane', fanAvatar: 'https://i.pravatar.cc/150?u=fan2', comment: "Just finished The Silent Forest and I'm speechless. The world-building is incredible. Is there going to be a sequel??", aiReplySuggestion: "Thank you so much for reading! I'm so glad you enjoyed the world of The Silent Forest. I can't say anything official yet, but let's just say I'm not done with that world... 😉" },
+                { interactionId: 'fi-5', fanName: 'Alex R.', fanAvatar: 'https://i.pravatar.cc/150?u=fan4', comment: "When are you touring next? Would love to see you live!", aiReplySuggestion: "Thanks for the love! We're working on some tour dates right now. Make sure you're following on Bandsintown or signed up for the newsletter to be the first to know!" }
+            ]
+        };
+    }
+};
+
+export const getBrandReport = async (keywords: BrandKeyword[]): Promise<BrandReport> => {
+    try {
+        const activeKeywords = keywords.filter(k => k.isActive).map(k => k.text).join(', ');
+        if (!activeKeywords) throw new Error("No active keywords provided for brand analysis.");
+
+        const prompt = `You are a professional brand strategist and PR analyst. Using Google Search, analyze the public perception of a creative brand based on these keywords: "${activeKeywords}".
+        Provide a comprehensive brand report as a JSON object. The report must include:
+        1.  A "sentiment" object with scores (0-100) for positive, neutral, and negative sentiment, and lists of key topics driving positive and negative discussions.
+        2.  An "archetype" object identifying the brand's primary Jungian archetype (e.g., The Creator, The Rebel, The Sage), with a brief description and a few keywords that define it.
+        3.  A "swot" analysis object with concise lists of Strengths, Weaknesses, Opportunities, and Threats based on the public discourse.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                tools: [{ googleSearch: {} }],
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        sentiment: {
+                            type: Type.OBJECT,
+                            properties: {
+                                positiveScore: { type: Type.NUMBER },
+                                neutralScore: { type: Type.NUMBER },
+                                negativeScore: { type: Type.NUMBER },
+                                keyPositiveTopics: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                keyNegativeTopics: { type: Type.ARRAY, items: { type: Type.STRING } }
+                            }
+                        },
+                        archetype: {
+                            type: Type.OBJECT,
+                            properties: {
+                                name: { type: Type.STRING },
+                                description: { type: Type.STRING },
+                                keywords: { type: Type.ARRAY, items: { type: Type.STRING } }
+                            }
+                        },
+                        swot: {
+                            type: Type.OBJECT,
+                            properties: {
+                                strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                opportunities: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                threats: { type: Type.ARRAY, items: { type: Type.STRING } }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const jsonStr = response.text.trim();
+        const reportData = JSON.parse(jsonStr);
+        
+        return {
+            ...reportData,
+            generatedAt: new Date().toISOString()
+        };
+
+    } catch (error) {
+        console.error("Error generating brand report:", error);
+        // Fallback mock data
+        return {
+            generatedAt: new Date().toISOString(),
+            sentiment: {
+                positiveScore: 65,
+                neutralScore: 25,
+                negativeScore: 10,
+                keyPositiveTopics: ["Nostalgic synth sounds", "Engaging live performances", "Authentic social media presence"],
+                keyNegativeTopics: ["Long wait between releases", "Merchandise shipping times"]
+            },
+            archetype: {
+                name: "The Magician",
+                description: "Creates transformative and immersive experiences, making dreams a reality for their audience.",
+                keywords: ["Visionary", "Immersive", "Mysterious", "Charismatic"]
+            },
+            swot: {
+                strengths: ["Strong, loyal fanbase", "Unique and recognizable sonic identity", "High engagement on Instagram"],
+                weaknesses: ["Infrequent release schedule", "Limited presence on TikTok", "Narrow genre appeal"],
+                opportunities: ["Collaborate with a visual artist for immersive live shows", "Launch a Patreon for exclusive content", "Utilize trending retro themes on TikTok"],
+                threats: ["Rise of similar-sounding artists", "Audience burnout from long waits", "Changes in streaming royalty payouts"]
+            }
+        };
+    }
+};
+
 
 // MOCK DASHBOARD DATA AGGREGATORS
 export const getAdminDashboardData = () => ({

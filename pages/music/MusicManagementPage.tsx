@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import DashboardPage from '../DashboardPage';
 import MusicDashboard from './MusicDashboard';
@@ -7,9 +7,16 @@ import Artists from './Artists';
 import ArtistDetail from './ArtistDetail';
 import Royalties from './Royalties';
 import Distribution from './Distribution';
+import { AuthContext } from '../../context/AuthContext';
+import { Role } from '../../types';
 
 const MusicManagementPage: React.FC = () => {
     const location = useLocation();
+    const { user } = useContext(AuthContext);
+
+    if (user && ![Role.ADMIN, Role.MUSIC_CREATOR].includes(user.role)) {
+        return <Navigate to="/home" replace />;
+    }
     
     const getTitle = () => {
         const path = location.pathname.split('/music/')[1] || 'dashboard';

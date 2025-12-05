@@ -1,8 +1,8 @@
-// FIX: This file was a placeholder. Added page implementation.
+
 import React, { useState, useMemo } from 'react';
-import Card from '../../components/ui/Card';
 import { getOrders } from '../../services/api';
 import { Order, OrderStatus } from '../../types';
+import ResourceTablePage, { Column } from '../../components/common/ResourceTablePage';
 
 const OrderStatusBadge: React.FC<{ status: OrderStatus }> = ({ status }) => {
     const statusStyles = {
@@ -23,53 +23,49 @@ const Orders: React.FC = () => {
         return orders.filter(order => order.status === statusFilter);
     }, [orders, statusFilter]);
 
-    const filterOptions: (OrderStatus | 'All')[] = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    const filterOptions = ['All', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+    const columns: Column<Order>[] = [
+        { header: 'Order ID', render: (o) => <span className="font-medium text-white">{o.id}</span> },
+        { header: 'Customer', render: (o) => <span className="text-gray-300">{o.customerName}</span> },
+        { header: 'Date', render: (o) => <span className="text-gray-300">{o.date}</span> },
+        { header: 'Total', render: (o) => <span className="text-gray-300">${o.total.toFixed(2)}</span> },
+        { header: 'Status', render: (o) => <OrderStatusBadge status={o.status} /> },
+    ];
+
+    // Empty component for modal as we don't create orders manually in this view yet
+    const NoOpModal = ({ onClose }: { onClose: () => void }) => (
+        <div className="text-center p-4">
+            <p className="mb-4">Order creation is handled via the storefront.</p>
+            <button onClick={onClose} className="bg-primary-purple px-4 py-2 rounded">Close</button>
+        </div>
+    );
 
     return (
-        <div className="space-y-6">
-            <Card className="p-4">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-white">All Orders</h2>
-                    <div className="flex items-center space-x-2">
-                        <label className="text-sm text-gray-400">Filter by status:</label>
-                        <select
-                            value={statusFilter}
-                            onChange={e => setStatusFilter(e.target.value as any)}
-                            className="bg-dark-bg border border-dark-border rounded-lg p-2 text-sm"
-                        >
-                            {filterOptions.map(opt => <option key={opt}>{opt}</option>)}
-                        </select>
-                    </div>
-                </div>
-            </Card>
-            
-            <Card>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-dark-border">
-                        <thead className="bg-dark-bg">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Order ID</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Customer</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Total</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-dark-border">
-                            {filteredOrders.map(order => (
-                                <tr key={order.id} className="hover:bg-dark-bg">
-                                    <td className="px-6 py-4 text-sm font-medium text-white">{order.id}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-300">{order.customerName}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-300">{order.date}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-300">${order.total.toFixed(2)}</td>
-                                    <td className="px-6 py-4 text-sm"><OrderStatusBadge status={order.status} /></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
-        </div>
+        <ResourceTablePage<Order>
+            title="All Orders"
+            items={filteredOrders}
+            columns={columns}
+            searchKeys={['id', 'customerName']}
+            searchPlaceholder="Search orders..."
+            addNewButtonText="Manual Order" 
+            addModalTitle="Create Manual Order"
+            addModalContent={(onClose) => <NoOpModal onClose={onClose} />}
+            emptyState={{
+                icon: <span className="text-4xl">📦</span>,
+                title: "No Orders Yet",
+                description: statusFilter === 'All' 
+                    ? "Your sales history is empty. Promote your store to start receiving orders!" 
+                    : `No orders found with the status "${statusFilter}". Try adjusting your filters.`,
+                ctaText: "Refresh Orders"
+            }}
+            filterOptions={{
+                label: "Filter by status:",
+                options: filterOptions,
+                selected: statusFilter,
+                onSelect: (val) => setStatusFilter(val as OrderStatus | 'All')
+            }}
+        />
     );
 };
 

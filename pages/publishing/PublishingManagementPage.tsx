@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import DashboardPage from '../DashboardPage';
 import PublishingDashboard from './PublishingDashboard';
@@ -7,9 +7,16 @@ import Authors from './Authors';
 import AuthorDetail from './AuthorDetail';
 import Sales from './Sales';
 import Stores from './Stores';
+import { AuthContext } from '../../context/AuthContext';
+import { Role } from '../../types';
 
 const PublishingManagementPage: React.FC = () => {
     const location = useLocation();
+    const { user } = useContext(AuthContext);
+
+    if (user && ![Role.ADMIN, Role.BOOK_AUTHOR].includes(user.role)) {
+        return <Navigate to="/home" replace />;
+    }
     
     const getTitle = () => {
         const path = location.pathname.split('/publishing/')[1] || 'dashboard';

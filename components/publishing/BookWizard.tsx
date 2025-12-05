@@ -1,4 +1,3 @@
-// FIX: This was a placeholder file. Implemented a basic BookWizard component.
 import React, { useState } from 'react';
 import { Book } from '../../types';
 
@@ -8,47 +7,84 @@ interface BookWizardProps {
 }
 
 const BookWizard: React.FC<BookWizardProps> = ({ onComplete, onClose }) => {
-    const [step, setStep] = useState(1);
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
+    const [coverArt, setCoverArt] = useState('');
+    const [status, setStatus] = useState<'Published' | 'Draft'>('Draft');
 
-    const handleNext = () => setStep(s => s + 1);
-    const handleBack = () => setStep(s => s - 1);
-
-    const handleSubmit = () => {
-        onComplete({ title, author, status: 'Draft' });
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onComplete({ 
+            title, 
+            author, 
+            status, 
+            coverArt: coverArt || undefined // Pass undefined if empty to allow default in API
+        });
         onClose();
     };
 
+    const isFormValid = title.trim() !== '' && author.trim() !== '';
+
     return (
-        <div className="space-y-6 text-white">
-            {step === 1 && (
-                <div className="space-y-4">
-                    <h3 className="text-lg font-bold">Step 1: Book Details</h3>
-                    <div>
-                        <label className="text-sm">Book Title</label>
-                        <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full mt-1 bg-dark-bg p-2 rounded-md border border-dark-border" />
-                    </div>
-                    <div>
-                        <label className="text-sm">Author Name</label>
-                        <input type="text" value={author} onChange={e => setAuthor(e.target.value)} className="w-full mt-1 bg-dark-bg p-2 rounded-md border border-dark-border" />
-                    </div>
-                    <div className="flex justify-end pt-4">
-                        <button onClick={handleNext} disabled={!title || !author} className="bg-primary-purple py-2 px-6 rounded-lg disabled:opacity-50">Next</button>
-                    </div>
+        <form onSubmit={handleSubmit} className="space-y-6 text-white">
+            <div className="space-y-4">
+                <div>
+                    <label htmlFor="book-title" className="block text-sm font-medium text-gray-300">Book Title</label>
+                    <input 
+                        id="book-title"
+                        type="text" 
+                        value={title} 
+                        onChange={e => setTitle(e.target.value)} 
+                        className="w-full mt-1 bg-dark-bg p-3 rounded-md border border-dark-border"
+                        required
+                    />
                 </div>
-            )}
-            {step === 2 && (
-                <div className="space-y-4">
-                    <h3 className="text-lg font-bold">Step 2: Confirmation</h3>
-                    <p>You are about to create a draft for "<strong>{title}</strong>" by <strong>{author}</strong>.</p>
-                    <div className="flex justify-between pt-4">
-                         <button onClick={handleBack} className="bg-dark-border py-2 px-6 rounded-lg">Back</button>
-                        <button onClick={handleSubmit} className="bg-success-green py-2 px-6 rounded-lg">Create Book</button>
-                    </div>
+                <div>
+                    <label htmlFor="author-name" className="block text-sm font-medium text-gray-300">Author Name</label>
+                    <input 
+                        id="author-name"
+                        type="text" 
+                        value={author} 
+                        onChange={e => setAuthor(e.target.value)} 
+                        className="w-full mt-1 bg-dark-bg p-3 rounded-md border border-dark-border"
+                        required
+                    />
                 </div>
-            )}
-        </div>
+                 <div>
+                    <label htmlFor="cover-art" className="block text-sm font-medium text-gray-300">Cover Art URL</label>
+                    <input 
+                        id="cover-art"
+                        type="url" 
+                        value={coverArt} 
+                        onChange={e => setCoverArt(e.target.value)} 
+                        className="w-full mt-1 bg-dark-bg p-3 rounded-md border border-dark-border"
+                        placeholder="https://..."
+                    />
+                </div>
+                 <div>
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-300">Status</label>
+                    <select 
+                        id="status"
+                        value={status} 
+                        onChange={e => setStatus(e.target.value as 'Published' | 'Draft')} 
+                        className="w-full mt-1 bg-dark-bg p-3 rounded-md border border-dark-border"
+                    >
+                        <option value="Draft">Draft</option>
+                        <option value="Published">Published</option>
+                    </select>
+                </div>
+            </div>
+            <div className="flex justify-end items-center pt-4 space-x-4">
+                 <button type="button" onClick={onClose} className="bg-dark-border py-2 px-6 rounded-lg">Cancel</button>
+                 <button 
+                    type="submit" 
+                    disabled={!isFormValid}
+                    className="bg-primary-purple py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Create Book
+                </button>
+            </div>
+        </form>
     );
 };
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import DashboardPage from '../DashboardPage';
-import MusicAnalyticsPage from './MusicAnalyticsPage';
 import SmartLinksPage from './SmartLinksPage';
 import AIStudioPage from './AIStudioPage';
 import CreativeStudioPage from './CreativeStudioPage';
@@ -13,6 +12,7 @@ import CalendarPage from './CalendarPage';
 import MediaMonitoringPage from './MediaMonitoringPage';
 import AIAssistantPage from './AIAssistantPage';
 import ContentLibraryPage from './ContentLibraryPage';
+const AICampaignStrategistPage = React.lazy(() => import('./AICampaignStrategistPage'));
 
 const MarketingManagementPage: React.FC = () => {
     const location = useLocation();
@@ -20,7 +20,6 @@ const MarketingManagementPage: React.FC = () => {
     const getTitle = () => {
         const path = location.pathname.split('/marketing/')[1] || 'analytics';
         switch(path) {
-            case 'analytics': return 'Music Analytics';
             case 'smart-links': return 'Smart Links';
             case 'ai-studio': return 'AI Studio';
             case 'creative-studio': return 'AI Creative Studio';
@@ -32,6 +31,7 @@ const MarketingManagementPage: React.FC = () => {
             case 'media-monitoring': return 'Media Monitoring';
             case 'ai-assistant': return 'AI Assistant';
             case 'content-library': return 'Content Library';
+            case 'ai-strategist': return 'AI Campaign Strategist';
             default: return 'Marketing & Promotion';
         }
     };
@@ -42,7 +42,6 @@ const MarketingManagementPage: React.FC = () => {
             component={
                 <Routes>
                     <Route path="/" element={<Navigate to="campaigns" replace />} />
-                    <Route path="analytics" element={<MusicAnalyticsPage />} />
                     <Route path="smart-links" element={<SmartLinksPage />} />
                     <Route path="ai-studio" element={<AIStudioPage />} />
                     <Route path="creative-studio" element={<CreativeStudioPage />} />
@@ -54,6 +53,7 @@ const MarketingManagementPage: React.FC = () => {
                     <Route path="media-monitoring" element={<MediaMonitoringPage />} />
                     <Route path="ai-assistant" element={<AIAssistantPage />} />
                     <Route path="content-library" element={<ContentLibraryPage />} />
+                    <Route path="ai-strategist" element={<AICampaignStrategistPage />} />
                 </Routes>
             }
         />

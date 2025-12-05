@@ -1,25 +1,17 @@
-// FIX: This was a placeholder file. Implemented the Releases page.
-import React, { useState, useMemo, useContext } from 'react';
+
+import React, { useState, useContext } from 'react';
 import { getMusicData, addRelease } from '../../services/api';
 import { MusicRelease } from '../../types';
 import ReleaseCard from '../../components/music/ReleaseCard';
-import Card from '../../components/ui/Card';
-import Modal from '../../components/ui/Modal';
 import ReleaseWizard from '../../components/music/ReleaseWizard';
 import { ToastContext } from '../../context/AuthContext';
+import ResourceListPage, { BulkAction } from '../../components/common/ResourceListPage';
+import Modal from '../../components/ui/Modal';
 
 const Releases: React.FC = () => {
     const { addToast } = useContext(ToastContext);
     const [releases, setReleases] = useState<MusicRelease[]>(getMusicData().releases);
-    const [selectedReleases, setSelectedReleases] = useState<string[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const handleSelect = (id: string) => {
-        setSelectedReleases(prev => 
-            prev.includes(id) ? prev.filter(rId => rId !== id) : [...prev, id]
-        );
-    };
+    const [viewRelease, setViewRelease] = useState<MusicRelease | null>(null);
 
     const handleReleaseAdded = (releaseData: Partial<MusicRelease>) => {
         const newRelease = addRelease(releaseData);
@@ -27,48 +19,121 @@ const Releases: React.FC = () => {
         addToast('Release created successfully!', 'success');
     };
 
-    const filteredReleases = useMemo(() => {
-        return releases.filter(r => 
-            r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.artist.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [releases, searchTerm]);
+    const bulkActions: BulkAction[] = [
+        {
+            label: 'Publish Selected',
+            variant: 'primary',
+            onClick: (ids) => {
+                setReleases(prev => prev.map(r => ids.includes(r.id) ? { ...r, status: 'Published' } : r));
+                addToast(`${ids.length} releases published!`, 'success');
+            }
+        },
+        {
+            label: 'Delete Selected',
+            variant: 'danger',
+            onClick: (ids) => {
+                if (window.confirm(`Are you sure you want to delete ${ids.length} releases?`)) {
+                     setReleases(prev => prev.filter(r => !ids.includes(r.id)));
+                     addToast(`${ids.length} releases deleted.`, 'success');
+                }
+            }
+        }
+    ];
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'Published': return 'bg-success-green/20 text-success-green';
+            case 'Pending': return 'bg-warning-yellow/20 text-warning-yellow';
+            default: return 'bg-gray-500/20 text-gray-400';
+        }
+    };
 
     return (
-        <div className="space-y-6">
-            <Card className="p-4">
-                <div className="flex justify-between items-center">
-                    <input 
-                        type="text" 
-                        placeholder="Search releases..." 
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="bg-dark-bg border border-dark-border rounded-lg p-2 text-sm w-64"
-                    />
-                    <button onClick={() => setIsModalOpen(true)} className="bg-primary-purple hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg">
-                        + New Release
-                    </button>
-                </div>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredReleases.map(release => (
+        <>
+            <ResourceListPage<MusicRelease>
+                items={releases}
+                renderItem={(release, isSelected, onSelect) => (
                     <ReleaseCard 
-                        key={release.id} 
                         release={release} 
-                        isSelected={selectedReleases.includes(release.id)}
-                        onSelect={handleSelect}
+                        isSelected={isSelected}
+                        onSelect={onSelect}
+                        onView={setViewRelease}
                     />
-                ))}
-            </div>
+                )}
+                searchKeys={['title', 'artist']}
+                searchPlaceholder="Search releases..."
+                addNewButtonText="New Release"
+                addModalTitle="Create New Release"
+                addModalContent={(onClose) => (
+                    <ReleaseWizard 
+                        onClose={onClose}
+                        onComplete={handleReleaseAdded}
+                    />
+                )}
+                emptyState={{
+                    icon: <>🎵</>,
+                    title: "Start Your Discography",
+                    description: "Your future hits belong here. Create your first release to start distributing your music to the world.",
+                    ctaText: "+ Create New Release",
+                }}
+                gridCols="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                bulkActions={bulkActions}
+            />
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Release">
-                <ReleaseWizard 
-                    onClose={() => setIsModalOpen(false)}
-                    onComplete={handleReleaseAdded}
-                />
+            <Modal 
+                isOpen={!!viewRelease} 
+                onClose={() => setViewRelease(null)} 
+                title="Release Details"
+            >
+                {viewRelease && (
+                    <div className="space-y-6">
+                        <div className="flex flex-col items-center text-center">
+                            <img src={viewRelease.coverArt} alt={viewRelease.title} className="w-48 h-48 object-cover rounded-lg shadow-lg mb-4" />
+                            <h3 className="text-2xl font-bold text-white">{viewRelease.title}</h3>
+                            <p className="text-lg text-gray-400">{viewRelease.artist}</p>
+                            <div className="mt-3">
+                                <span className={`px-4 py-1.5 text-sm font-semibold rounded-full ${getStatusColor(viewRelease.status)}`}>
+                                    {viewRelease.status}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 mt-6">
+                             <div className="bg-dark-bg p-4 rounded-lg text-center border border-dark-border">
+                                <p className="text-sm text-gray-400 mb-1">Total Streams</p>
+                                <p className="text-xl font-bold text-white">{viewRelease.streams.toLocaleString()}</p>
+                             </div>
+                             <div className="bg-dark-bg p-4 rounded-lg text-center border border-dark-border">
+                                <p className="text-sm text-gray-400 mb-1">Revenue</p>
+                                <p className="text-xl font-bold text-success-green">${viewRelease.revenue.toLocaleString()}</p>
+                             </div>
+                             <div className="bg-dark-bg p-4 rounded-lg text-center border border-dark-border">
+                                <p className="text-sm text-gray-400 mb-1">Active Platforms</p>
+                                <p className="text-xl font-bold text-white">{viewRelease.platforms}</p>
+                             </div>
+                        </div>
+
+                        <div className="bg-dark-bg p-4 rounded-lg border border-dark-border">
+                            <h4 className="text-sm font-semibold text-white mb-2">Quick Actions</h4>
+                            <div className="flex gap-3">
+                                <button className="flex-1 bg-primary-purple/10 text-primary-purple hover:bg-primary-purple/20 py-2 rounded-md text-sm font-medium transition-colors">
+                                    View Analytics
+                                </button>
+                                <button className="flex-1 bg-primary-blue/10 text-primary-blue hover:bg-primary-blue/20 py-2 rounded-md text-sm font-medium transition-colors">
+                                    Manage Distribution
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end pt-2">
+                            <button onClick={() => setViewRelease(null)} className="text-gray-400 hover:text-white transition-colors">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                )}
             </Modal>
-        </div>
+        </>
     );
 };
 

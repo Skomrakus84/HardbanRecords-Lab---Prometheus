@@ -8,6 +8,7 @@ interface ReleaseCardProps {
     // FIX: Make isSelected and onSelect optional for display-only usage.
     isSelected?: boolean;
     onSelect?: (id: string) => void;
+    onView?: (release: MusicRelease) => void;
 }
 
 const StatusBadge: React.FC<{ status: MusicRelease['status'] }> = ({ status }) => {
@@ -23,13 +24,12 @@ const StatusBadge: React.FC<{ status: MusicRelease['status'] }> = ({ status }) =
     );
 };
 
-const ReleaseCard: React.FC<ReleaseCardProps> = ({ release, isSelected = false, onSelect }) => {
+const ReleaseCard: React.FC<ReleaseCardProps> = ({ release, isSelected = false, onSelect, onView }) => {
     
-    // FIX: Removed unused event parameter to match Card's onClick prop type.
     const handleCardClick = () => {
-        // Prevent selection when clicking on interactive elements inside the card if any
-        // For now, the whole card is clickable for selection
-        onSelect?.(release.id);
+        if (onView) {
+            onView(release);
+        }
     };
 
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,19 +40,18 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({ release, isSelected = false, 
 
     return (
         <div className="relative">
-            <Card className={`overflow-hidden group transition-all duration-200 ${isSelected ? 'ring-2 ring-primary-purple scale-105' : 'ring-0'}`} onClick={onSelect ? handleCardClick : undefined}>
+            <Card className={`overflow-hidden group transition-all duration-200 ${isSelected ? 'ring-2 ring-primary-purple scale-105' : 'ring-0'}`} onClick={onView ? handleCardClick : undefined}>
                 <div className="relative">
                     <img src={release.coverArt} alt={release.title} className="w-full h-48 object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                     {/* FIX: Conditionally render selection UI only if onSelect is provided. */}
                     {onSelect && (
-                        <div className="absolute top-2 left-2 z-10">
+                        <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
                             <input 
                                 type="checkbox"
                                 checked={isSelected}
                                 onChange={handleCheckboxChange}
-                                onClick={(e) => e.stopPropagation()} // Prevent card click handler from firing twice
-                                className="h-5 w-5 rounded bg-dark-bg/50 border-gray-500 text-primary-purple focus:ring-primary-purple"
+                                className="h-5 w-5 rounded bg-dark-bg/50 border-gray-500 text-primary-purple focus:ring-primary-purple cursor-pointer"
                             />
                         </div>
                     )}
