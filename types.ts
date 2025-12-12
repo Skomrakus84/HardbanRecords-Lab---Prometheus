@@ -8,6 +8,12 @@ export enum Role {
     BOOK_AUTHOR = 'BOOK_AUTHOR',
 }
 
+export interface UserPreferences {
+    language: string;
+    currency: string;
+    timezone: string;
+}
+
 export interface User {
     id: string;
     name: string;
@@ -18,6 +24,7 @@ export interface User {
     bio?: string;
     location?: string;
     website?: string;
+    preferences?: UserPreferences;
 }
 
 export interface StatCardData {
@@ -503,4 +510,12 @@ export interface BrandReport {
     sentiment: BrandSentimentAnalysis;
     archetype: BrandArchetype;
     swot: SWOT;
+}
+
+export interface Integration {
+    id: string;
+    name: string;
+    type: 'Social' | 'Payment' | 'DSP' | 'Marketing';
+    iconUrl: string;
+    status: 'Connected' | 'Disconnected';
 }

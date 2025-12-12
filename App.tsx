@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthContext, ToastContext, Toast } from './context/AuthContext';
 import { Role, User } from './types';
 import Sidebar from './components/layout/Sidebar';
+import MobileNav from './components/layout/MobileNav';
 import OnboardingPage from './pages/OnboardingPage';
 import SuspenseLoader from './components/ui/SuspenseLoader';
 import ToastContainer from './components/ui/Toast';
@@ -31,12 +32,21 @@ const PrometheusGenesisPage = React.lazy(() => import('./pages/prometheus/Promet
 // --- Providers (moved from context/Providers.tsx to resolve loading issue) ---
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const savedUser = localStorage.getItem('hardban_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      console.error("Failed to load user from storage", e);
+      return null;
+    }
+  });
   const [showTutorialFor, setShowTutorialFor] = useState<Role | null>(null);
 
   const login = useCallback((role: Role) => {
+    let newUser: User;
     if (role === Role.ADMIN) {
-      setUser({
+      newUser = {
         id: 'admin-001',
         name: 'Alex Admin',
         role: Role.ADMIN,
@@ -44,10 +54,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         email: 'alex.admin@hardbanrecords.com',
         bio: 'Administrator overseeing the entire HardbanRecords platform operations.',
         location: 'Warsaw, Poland',
-        website: 'https://hardbanrecords.com'
-      });
+        website: 'https://hardbanrecords.com',
+        preferences: {
+            language: 'English',
+            currency: 'USD',
+            timezone: 'UTC+1'
+        }
+      };
     } else if (role === Role.MUSIC_CREATOR) {
-      setUser({
+      newUser = {
         id: 'creator-001',
         name: 'Casey Creator',
         role: Role.MUSIC_CREATOR,
@@ -55,10 +70,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         email: 'casey@synthwave.com',
         bio: 'Electronic music producer specializing in Synthwave and Chillwave. Creating dreamscapes through sound.',
         location: 'Los Angeles, USA',
-        website: 'https://caseycreator.com'
-      });
+        website: 'https://caseycreator.com',
+        preferences: {
+            language: 'English',
+            currency: 'USD',
+            timezone: 'UTC-8'
+        }
+      };
     } else { // BOOK_AUTHOR
-      setUser({
+      newUser = {
         id: 'author-001',
         name: 'Pat Publisher',
         role: Role.BOOK_AUTHOR,
@@ -66,19 +86,32 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         email: 'pat@publishing.com',
         bio: 'Bestselling author of Sci-Fi and Fantasy novels. Creating new worlds one page at a time.',
         location: 'London, UK',
-        website: 'https://patpublisher.com'
-      });
+        website: 'https://patpublisher.com',
+        preferences: {
+            language: 'English',
+            currency: 'GBP',
+            timezone: 'UTC+0'
+        }
+      };
     }
+    setUser(newUser);
+    localStorage.setItem('hardban_user', JSON.stringify(newUser));
     setShowTutorialFor(role);
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
+    localStorage.removeItem('hardban_user');
     setShowTutorialFor(null);
   }, []);
 
   const updateUser = useCallback((updatedData: Partial<User>) => {
-    setUser(currentUser => currentUser ? { ...currentUser, ...updatedData } : null);
+    setUser(currentUser => {
+        if (!currentUser) return null;
+        const updatedUser = { ...currentUser, ...updatedData };
+        localStorage.setItem('hardban_user', JSON.stringify(updatedUser));
+        return updatedUser;
+    });
   }, []);
 
   return (
@@ -138,7 +171,7 @@ const AppContent: React.FC = () => {
       {showTutorialFor && <Tutorial role={showTutorialFor} onClose={() => setShowTutorialFor(null)} />}
       <div className="flex bg-dark-bg min-h-screen text-gray-200">
         <Sidebar />
-        <main className="flex-1 ml-64">
+        <main className="flex-1 md:ml-64 mb-16 md:mb-0 transition-all duration-300">
           <Suspense fallback={<div className="h-screen w-full flex items-center justify-center"><SuspenseLoader /></div>}>
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
@@ -160,6 +193,7 @@ const AppContent: React.FC = () => {
             </Routes>
           </Suspense>
         </main>
+        <MobileNav />
       </div>
     </>
   );

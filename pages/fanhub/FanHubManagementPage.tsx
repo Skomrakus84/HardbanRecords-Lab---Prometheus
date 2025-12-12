@@ -1,7 +1,10 @@
+
 import React from 'react';
 import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import DashboardPage from '../DashboardPage';
 import CommunityDashboardPage from './CommunityDashboardPage';
+import SubscriptionsPage from './SubscriptionsPage';
+import ExclusiveContentPage from './ExclusiveContentPage';
 
 const FanHubManagementPage: React.FC = () => {
     const location = useLocation();
@@ -10,6 +13,8 @@ const FanHubManagementPage: React.FC = () => {
         const path = location.pathname.split('/fanhub/')[1] || 'dashboard';
         switch(path) {
             case 'dashboard': return 'Fan Hub Dashboard';
+            case 'subscriptions': return 'Fan Subscriptions';
+            case 'content': return 'Exclusive Content';
             default: return 'Fan Hub';
         }
     };
@@ -50,7 +55,8 @@ const FanHubManagementPage: React.FC = () => {
                         <Routes>
                             <Route path="/" element={<Navigate to="dashboard" replace />} />
                             <Route path="dashboard" element={<CommunityDashboardPage />} />
-                            {/* Add routes for other Fan Hub pages here */}
+                            <Route path="subscriptions" element={<SubscriptionsPage />} />
+                            <Route path="content" element={<ExclusiveContentPage />} />
                         </Routes>
                     </div>
                 </div>
