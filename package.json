@@ -6,16 +6,22 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:prod": "NODE_ENV=production vite build",
+    "docker:build": "docker build -t hardbanrecords-lab .",
+    "docker:run": "docker run -p 3000:80 hardbanrecords-lab",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
   },
   "dependencies": {
+    "@google/genai": "^1.19.0",
+    "d3-scale": "^4.0.2",
+    "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.1",
-    "recharts": "^3.2.0",
-    "react-simple-maps": "^3.0.0",
-    "d3-scale": "^4.0.2",
-    "@google/genai": "^1.19.0"
+    "react-simple-maps": "^4.0.0-beta.6",
+    "recharts": "^3.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
